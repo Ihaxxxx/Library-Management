@@ -70,9 +70,9 @@ npm run dev
 ## 📸 Screenshots
 
 
-![Alt text](./screenshots/MainPage.png)
-![Alt text](./screenshots/ReIssueBook.png)
-![Alt text](./screenshots/ReturnBook.png)
+![Dashboard](./ScreenShots/MainPage.png)
+![Dashboard](./ScreenShots/ReIssueBook.png)
+![Dashboard](./ScreenShots/ReturnBook.png)
 
 ---
 
