@@ -1,11 +1,13 @@
+'use client'
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 import Navbar from "../components/Navbar";
 
 export default function IssueBook() {
   const { bookid } = useParams();
-  console.log(bookid);
 
   const [bookDetails, setBookDetails] = useState<any>({
     title: "",

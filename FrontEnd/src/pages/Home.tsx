@@ -7,7 +7,6 @@ function Home() {
     <>
     <Navbar></Navbar>
     <div>Home</div>
-    
     </>
   )
 }

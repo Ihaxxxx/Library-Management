@@ -12,29 +12,36 @@ async function getBookCategories() {
   return categories;
 }
 
-async function getSpecificBooks(offset, limit, category, ratingOrder = "desc") {
-  const order = ratingOrder.toLowerCase() === "asc" ? "ASC" : "DESC";
-  if (category !== "") {
+async function getSpecificBooks(offset, limit, category, sortBy = "rating", orderDirection = "desc") {
+  const validSortColumns = {
+    rating: "books.average_rating",
+    id: "books.id"
+  };
+  const orderColumn = validSortColumns[sortBy.toLowerCase()] || validSortColumns["rating"];
+  const order = orderDirection.toLowerCase() === "asc" ? "ASC" : "DESC";
+
+  if (category && category !== "") {
     const [rows] = await db.query(
       `
-  SELECT 
-    books.id, 
-    books.title, 
-    books.average_rating, 
-    books.published_year, 
-    books.category, 
-    books.imageurl, 
-    authors.name AS author, 
-    CASE WHEN ib.book_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_issued,
-    (SELECT COUNT(*) FROM books WHERE category = ? AND title != '') AS categoryCount
-  FROM books 
-  INNER JOIN book_authors ON books.id = book_authors.book_id 
-  INNER JOIN authors ON book_authors.author_id = authors.id 
-  LEFT JOIN issued_books ib ON books.id = ib.book_id AND ib.returned_date IS NULL
-  WHERE books.title != '' AND books.category = ?
-  ORDER BY books.average_rating ${order}
-  LIMIT ? OFFSET ?;
-  `,
+      SELECT 
+        books.id, 
+        books.title, 
+        books.average_rating, 
+        books.published_year, 
+        books.category, 
+        books.imageurl, 
+        GROUP_CONCAT(authors.name SEPARATOR ', ') AS authors,
+        CASE WHEN ib.book_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_issued,
+        (SELECT COUNT(DISTINCT books.id) FROM books WHERE category = ? AND title != '') AS categoryCount
+      FROM books 
+      INNER JOIN book_authors ON books.id = book_authors.book_id 
+      INNER JOIN authors ON book_authors.author_id = authors.id 
+      LEFT JOIN issued_books ib ON books.id = ib.book_id AND ib.returned_date IS NULL
+      WHERE books.title != '' AND books.category = ?
+      GROUP BY books.id
+      ORDER BY ${orderColumn} ${order}
+      LIMIT ? OFFSET ?;
+      `,
       [category, category, limit, offset]
     );
 
@@ -42,29 +49,33 @@ async function getSpecificBooks(offset, limit, category, ratingOrder = "desc") {
   } else {
     const [rows] = await db.query(
       `
-  SELECT 
-    books.id, 
-    books.title, 
-    books.average_rating, 
-    books.published_year, 
-    books.category, 
-    books.imageurl, 
-    authors.name AS author,
-    CASE WHEN ib.book_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_issued,
-    (SELECT COUNT(*) FROM books WHERE title != '') AS categoryCount
-  FROM books 
-  INNER JOIN book_authors ON books.id = book_authors.book_id 
-  INNER JOIN authors ON book_authors.author_id = authors.id 
-  LEFT JOIN issued_books ib ON books.id = ib.book_id AND ib.returned_date IS NULL
-  WHERE books.title != ''
-  ORDER BY books.average_rating ${order}
-  LIMIT ? OFFSET ?;
-`,
+      SELECT 
+        books.id, 
+        books.title, 
+        books.average_rating, 
+        books.published_year, 
+        books.category, 
+        books.imageurl, 
+        GROUP_CONCAT(authors.name SEPARATOR ', ') AS authors,
+        CASE WHEN ib.book_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_issued,
+        (SELECT COUNT(DISTINCT books.id) FROM books WHERE title != '') AS categoryCount
+      FROM books 
+      INNER JOIN book_authors ON books.id = book_authors.book_id 
+      INNER JOIN authors ON book_authors.author_id = authors.id 
+      LEFT JOIN issued_books ib ON books.id = ib.book_id AND ib.returned_date IS NULL
+      WHERE books.title != ''
+      GROUP BY books.id
+      ORDER BY ${orderColumn} ${order}
+      LIMIT ? OFFSET ?;
+      `,
       [limit, offset]
     );
-    return rows
+
+    return rows;
   }
 }
+
+
 
 async function getSingleBook(book_id) {
   try {

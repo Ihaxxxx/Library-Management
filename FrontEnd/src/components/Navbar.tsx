@@ -7,11 +7,13 @@ import getCookie from '../utils/getCookie'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 const navigation = [
+    { name: 'Home', href: '/home' },
     { name: 'Books', href: '/books' },
     { name: 'Add Customer', href: '/addcustomer' },
     { name: 'Issue Book', href: '/issuebook' },
     { name: 'Return Book', href: '/returnbook' },
     { name: 'Re Issue', href: '/reissue' },
+    { name: 'Users', href: '/users' },
 ]
 
 type NavbarProps = {

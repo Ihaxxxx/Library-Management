@@ -102,6 +102,7 @@ export default function IssueBook() {
     }
 
     try {
+      console.log("insinde issue");
       const data = await fetch(`${backendUrl}/book/issuebook`, {
         method: "POST",
         credentials: "include",
@@ -115,7 +116,7 @@ export default function IssueBook() {
       });
 
       const response = await data.json();
-
+      console.log(response);
       if (data.status === 400) {
         setBookIssued(false);
         setIssueError(response.error || "Book is already issued to someone.");

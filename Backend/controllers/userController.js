@@ -1,7 +1,9 @@
-const { getUsers, createUser, loginUser, createCustomer , getUserDetails , issuedBooks , userExists} = require('../models/userModel');
+const { getUsers, createUser, loginUser, createCustomer , getUserDetails , issuedBooks , userExists , getSpecificUser} = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { generateToken } = require("../utilities/generateToken")
 
+
+// create admin
 const getUsersController = async (req, res) => {
   try {
     const users = await getUsers();
@@ -11,6 +13,7 @@ const getUsersController = async (req, res) => {
   }
 };
 
+// create admin
 const createUserController = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   try {
@@ -27,6 +30,7 @@ const createUserController = async (req, res) => {
 };
 
 
+// loggin in the user
 const loginUserController = async (req, res) => {
   const { email, password } = req.body
   try {
@@ -43,6 +47,7 @@ const loginUserController = async (req, res) => {
   }
 };
 
+// logging user out
 const logoutUser = async function (req, res) {
     res.clearCookie("token", {
         httpOnly: true,
@@ -52,12 +57,13 @@ const logoutUser = async function (req, res) {
     return res.status(200).json({ message: "Logged out successfully" });
 };
 
-
+// create customer tab
 const createCustomerController = async (req, res) => {
   const { firstName, lastName, email, password } = req.body.formData;
   console.log(req.body.formData);
   try {
     const user = await createCustomer(firstName, lastName, email, password);
+    console.log(user);
     res.status(201).json(user);
   } catch (err) {
     if (err.message === 'User already exists') {
@@ -69,6 +75,7 @@ const createCustomerController = async (req, res) => {
   }
 };
 
+// get details about users book
 const getUserController = async (req, res) => {
   try {
     const userid = req.params.userid;
@@ -84,6 +91,24 @@ const getUserController = async (req, res) => {
 };
 
 
+// Controller for users page 
+const getSpecificUserController = async (req,res) => {
+  const { userid } = req.params;
+  try {
+    const userDetailsWithBooks = await getSpecificUser(userid)
+    if (userDetailsWithBooks.length != 0) {
+      res.json(userDetailsWithBooks);  
+    }else{
+      const user = await getUserDetails(userid)
+      res.json(user)
+      console.log(user);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+//  get issued books in issued book
 const getIssuedBooks = async (req, res) => {
   const { userid } = req.params;
   try {
@@ -109,4 +134,6 @@ module.exports = {
   logoutUser,
   getUserDetails : getUserController, // to get in issue book
   issuedBooks : getIssuedBooks, // to get data in return books
+  getUsers : getUsersController,
+  getSpecificUser : getSpecificUserController
 };

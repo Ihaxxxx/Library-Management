@@ -4,8 +4,6 @@ const getAllBooks = async (req, res) => {
   try {
     const bookCount = await BookModel.getBookCount();
     const categories = await BookModel.getBookCategories();
-    console.log(bookCount);
-    console.log(categories);
     res.json({ totalBooks: bookCount.total, categories });
   } catch (err) {
     console.error("Error in getBooks:", err);
@@ -15,15 +13,21 @@ const getAllBooks = async (req, res) => {
 
 const getSpecificBooks = async (req, res) => {
   try {
-    const { offset, limit, category, ratingOrder } = req.body;
-    const books = await BookModel.getSpecificBooks(offset, limit, category, ratingOrder);
+    const { offset, limit, category, sortBy, orderDirection } = req.body;
+    const books = await BookModel.getSpecificBooks(
+      offset,
+      limit,
+      category,
+      sortBy,
+      orderDirection
+    );
+
     res.json(books);
   } catch (err) {
     console.error("Error in getBooks:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const getSingleBook = async (req, res) => {
   try {
@@ -39,10 +43,9 @@ const getSingleBook = async (req, res) => {
   }
 };
 
-
 const issueBook = async (req, res) => {
   try {
-    const books = await BookModel.issueBook(req.body.bookid,req.body.userid);
+    const books = await BookModel.issueBook(req.body.bookid, req.body.userid);
     res.status(200).json(books);
   } catch (err) {
     res.status(500).json({ error: "Internal server error" });
@@ -69,17 +72,15 @@ const reIssueBook = async (req, res) => {
   }
 };
 
-
-
-
 const returnBook = async (req, res) => {
   const { userid, bookid } = req.body;
   try {
-    
     const success = await BookModel.returnBook(userid, bookid);
 
     if (!success) {
-      return res.status(404).json({ error: "Book not found or already returned." });
+      return res
+        .status(404)
+        .json({ error: "Book not found or already returned." });
     }
 
     res.status(200).json({ message: "Book returned successfully." });
@@ -89,6 +90,11 @@ const returnBook = async (req, res) => {
   }
 };
 
-
-
-module.exports = { getAllBooks, getSpecificBooks, getSingleBook , issueBook , returnBook , reIssueBook};
+module.exports = {
+  getAllBooks,
+  getSpecificBooks,
+  getSingleBook,
+  issueBook,
+  returnBook,
+  reIssueBook,
+};

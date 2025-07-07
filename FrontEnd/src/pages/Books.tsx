@@ -17,14 +17,15 @@ function Books() {
   const [categories, setCategories] = useState<any[]>([]);
   const [booksPerPageSize, setBooksPerPageSize] = useState(50);
   const [categoryChangeValue, setCategoryChangeValue] = useState<string>("");
-  const [ratingOrder, setRatingOrder] = useState<"asc" | "desc">("desc");
+  const [sortBy, setSortBy] = useState<"rating" | "id">("rating");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     async function fetchBooks() {
       let data = await fetch(`${backendUrl}/book/getallbooksdata`);
       let response = await data.json();
-
-      console.log(response.totalBooks);
+      console.log(response);
+      // console.log(response.totalBooks);
       setBookCount(response.totalBooks);
       console.log(Math.floor(response.totalBooks / booksPerPageSize) + 1);
       setNumberOfPages(Math.floor(response.totalBooks / booksPerPageSize) + 1);
@@ -61,7 +62,8 @@ function Books() {
           offset,
           limit: booksPerPageSize,
           category: categoryChangeValue,
-          ratingOrder,
+          sortBy,
+          orderDirection,
         }),
       });
       let response = await data.json();
@@ -84,7 +86,13 @@ function Books() {
       setLoadData(true);
     }
     fetchBooks();
-  }, [pageNumber, booksPerPageSize, categoryChangeValue,ratingOrder]);
+  }, [
+    pageNumber,
+    booksPerPageSize,
+    categoryChangeValue,
+    sortBy,
+    orderDirection,
+  ]);
 
   useEffect(() => {
     console.log(categoryChangeValue);
@@ -127,21 +135,42 @@ function Books() {
                   <option value={50}>50</option>
                 </select>
               </div>
-              <div className="flex items-center space-x-2 mt-4">
-                <label htmlFor="sortRating" className="text-sm text-gray-700">
-                  Sort by Rating:
-                </label>
-                <select
-                  id="sortRating"
-                  value={ratingOrder}
-                  onChange={(e) =>
-                    setRatingOrder(e.target.value as "asc" | "desc")
-                  }
-                  className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="desc">High to Low</option>
-                  <option value="asc">Low to High</option>
-                </select>
+              <div className="flex flex-wrap items-center space-x-4 space-y-2 mt-4 text-gray-700">
+                {/* Sort by */}
+                <div className="flex items-center space-x-2">
+                  <label htmlFor="sortBy" className="font-medium">
+                    Sort by:
+                  </label>
+                  <select
+                    id="sortBy"
+                    value={sortBy}
+                    onChange={(e) =>
+                      setSortBy(e.target.value as "rating" | "id")
+                    }
+                    className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 hover:border-blue-400"
+                  >
+                    <option value="rating">Rating</option>
+                    <option value="id">ID</option>
+                  </select>
+                </div>
+
+                {/* Order */}
+                <div className="flex items-center space-x-2">
+                  <label htmlFor="orderDirection" className="font-medium">
+                    Order:
+                  </label>
+                  <select
+                    id="orderDirection"
+                    value={orderDirection}
+                    onChange={(e) =>
+                      setOrderDirection(e.target.value as "asc" | "desc")
+                    }
+                    className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 hover:border-blue-400"
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
               </div>
 
               <MainMenuBooks

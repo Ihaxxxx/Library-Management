@@ -5,6 +5,12 @@ const userController = require('../controllers/userController');
 // Route to create a user 
 router.post('/createuser', userController.createUser);
 
+// Get All users
+router.get('/getusers',userController.getUsers)
+
+// Get single user
+router.get('/getspecificuser/:userid',userController.getSpecificUser)
+
 // route to login a user
 router.post('/loginuser', userController.loginUser);
 

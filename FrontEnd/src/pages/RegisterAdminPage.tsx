@@ -32,7 +32,7 @@ export default function RegisterAdminPage() {
         })
       })
       if (data.status == 201) {
-        navigate('/dashboard');
+        navigate('/home');
       } else if (data.status == 400) {
         setResponseStatus(false)
       } else if (data.status == 500) {

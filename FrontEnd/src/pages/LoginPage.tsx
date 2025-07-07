@@ -31,7 +31,7 @@ function LoginPage() {
             if (!response.success) {
                 setResponseStatus(false)
             } else {
-                navigate('/dashboard');
+                navigate('/home');
                 // alert("meow")
             }
         } else {
